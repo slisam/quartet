@@ -13,15 +13,18 @@ class Quartet() :
         
     def main(self):
         while True :  
+            self.create_deck()
             self.card_distribution(self.player_decks, self.deck)
             self.check_quartet(self.player_decks, self.deck)
+            print(self.deck, self.player_decks, self.score , self.quartet, sep="\n")
+            break
 
 
     def create_deck(self): 
-        deck = []
+        self.deck = []
         for letter in self.cards:
-            [deck.append((letter,i)) for i in range(4)]
-        return deck
+            [self.deck.append((letter,i)) for i in range(4)]
+        return self.deck
 
     def display_state(self,player_decks):
         for player in player_decks.keys():
