@@ -1,3 +1,4 @@
+from collections import defaultdict
 import random
 from typing import Counter
 
@@ -20,7 +21,6 @@ class Quartet() :
                 self.display_cards(self.player_decks)   
                 self.whos_turn(player)
                 self.availables_cards(player, self.player_decks, self.deck)
-
             break
 
     def create_deck(self): 
@@ -29,20 +29,23 @@ class Quartet() :
             [self.deck.append((letter,i)) for i in range(4)]
         return self.deck
 
-    def display_state(self,player_decks):
-        for player in player_decks.keys():
-            print(player,':', self.display_cards(player_decks[player]))
-
     def whos_turn(self,player):
         return print("it's {}'s turn".format(player))
-    
+
+    def whos_card(self,cards_can_be_asked, card_to_ask):
+        for owner, cards in cards_can_be_asked.items():
+            for card in cards :
+                if card == card_to_ask:
+                    cards_owner = owner
+        return owner
 
     def display_cards(self,cards_list):
         for player in self.players:
-            extract_list = [c+'-'+str(v) for c, v in cards_list[player]]
-            display = player+" : "+', '.join(extract_list).replace(',','')
-            print(display)
-        return display
+            tuple_to_list = [c+'-'+str(v) for c, v in cards_list[player]]
+            display_from_list = player+" : "+', '.join(tuple_to_list).replace(',','')
+            print(display_from_list) 
+
+#test affichage des cartes
 
     def check_cards_left(self, deck): 
         return len(deck)
@@ -57,21 +60,26 @@ class Quartet() :
     def availables_cards(self,player, player_decks, deck):
         available_deck = player_decks.copy()
         available_deck.pop(player)
-        available_deck["Deck"] = deck
-        player_hand = []
-        [player_hand.append(k) for k,v in player_decks[player]] # get the letters of cards owned by the player
-        cards_can_be_asked = []
-        for decks in available_deck.values():
-            for cards in decks : 
-                if cards[0] in player_hand :
-                    cards_can_be_asked.append(cards)
-        nb_cards_to_ask = len(cards_can_be_asked) 
-        card_to_ask = random.choice(cards_can_be_asked)
-        card_to_ask = "{}-{}".format(*card_to_ask)
-        return self.display_asking(player, nb_cards_to_ask,card_to_ask)
+        available_deck["stack"] = deck
+        letters_owned = []
+        [letters_owned.append(k) for k,v in player_decks[player]] # get the letters of cards owned by the player
+        cards_can_be_asked = defaultdict(dict)
+        for decks in available_deck:
+            for owner, cards in available_deck.items():
+                cards_match=[]
+                for card in cards:
+                    if card[0] in letters_owned :
+                        cards_match.append(card)
+                cards_can_be_asked[owner]=cards_match
+        test = [item for sublist in cards_can_be_asked.values() for item in sublist]
+        list_can_be_asked = [cards_can_be_asked[x] for x in cards_can_be_asked if isinstance(cards_can_be_asked[x], list)]
+        nb_cards_to_ask = sum([len(cards_can_be_asked[x]) for x in cards_can_be_asked if isinstance(cards_can_be_asked[x], list)])
+        card_to_ask = random.choice([item for sublist in list_can_be_asked for item in sublist]) # make a flat list to choose random tuple
+        display_card_to_ask = "{}-{}".format(*card_to_ask)
+        self.whos_card(cards_can_be_asked, card_to_ask)
+        print(owner)
+        print("There are {0} cards {1} can ask for \n{1} is asking for {2}".format(nb_cards_to_ask, player, display_card_to_ask))
 
-    def display_asking(self, player,nb_cards_to_ask,card_to_ask):
-        return print("There are {0} cards {1} can ask for \n {1} is asking for {2}".format(nb_cards_to_ask, player, card_to_ask))
 
 
     def check_quartet(self, player_decks, deck):
