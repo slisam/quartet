@@ -105,8 +105,6 @@ class Quartet:
             player_to_ask = random.choice(player_to_ask)
             if len(ask_log) == 0 or [player_to_ask] not in ask_log[player_to_ask]:
                 break
-            else:
-                break
         print(
             "{} is asking for {} from {}".format(
                 player, display_card_to_ask, player_to_ask
