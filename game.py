@@ -1,6 +1,7 @@
 from collections import defaultdict
 import random
 from typing import Counter
+import sys
 
 class Quartet() :
 
@@ -16,12 +17,12 @@ class Quartet() :
     def main(self):
         self.create_deck()
         self.card_distribution( self.deck)
-        for i in range(20) :
+        while True :
             for player in self.players:
                 self.display_cards(self.player_decks) 
                 self.check_quartet(self.player_decks)  
                 self.whos_turn(player)
-                self.availables_cards(player, self.player_decks, self.ask_log)
+                self.draw_card(player, self.player_decks, self.ask_log)
         
 
     def create_deck(self): 
@@ -41,8 +42,6 @@ class Quartet() :
 
 #test affichage des cartes
 
-    def check_cards_left(self, deck): 
-        return len(deck)
 
     def card_distribution(self,  deck):
         for player in self.players:
@@ -51,7 +50,7 @@ class Quartet() :
             [self.deck.remove(x) for x in picked_cards]
         return self.player_decks 
 
-    def availables_cards(self,player, player_decks, ask_log):
+    def draw_card(self,player, player_decks, ask_log):
         available_deck = player_decks.copy()
         available_deck.pop(player)
         # available_deck["stack"] = deck
@@ -72,30 +71,25 @@ class Quartet() :
             player_to_ask = self.players.copy()
             player_to_ask.remove(player)
             player_to_ask = random.choice(player_to_ask)
-            print(card_to_ask,ask_log,player_to_ask)
-            if card_to_ask in ask_log[player_to_ask]: 
-                print("already asked")
-                print(card_to_ask,player_to_ask, ask_log)
-                continue 
-            if card_to_ask:
-                #trouver la condition qui permet de sortir de la boucle (joueur possède bien la carte demandée)
+            if len(ask_log)== 0 or [player_to_ask] not in ask_log[player_to_ask] :
+                print("not asked")
                 break
-            else : 
-                print("NOTHIINNNG")
+            else :
+                print("already asked")
+                print(card_to_ask[player_to_ask], ask_log)
+                continue 
         try :
             display_card_to_ask = "{}-{}".format(*card_to_ask)
             print("There are {0} cards {1} can ask for \n{1} is asking for {2} from {3}".format(nb_cards_to_ask, player, display_card_to_ask,player_to_ask))
             self.check_ask(player_to_ask, card_to_ask,self.player_decks, self.ask_log, player) 
-        except IndexError:
+        except :
             print("{} is out of cards".format(player))
             self.players.remove(player)
             if not self.players:
-                self.end_game()
-
-    def end_game(self):  
-        print("All players out of cards - game is over!")
-        for player, score in self.score.items():
-            print("{} has {} quartet(s)".format(player, score))
+                print("All players out of cards - game is over!")
+                for player, score in self.score.items():
+                    print("{} has {} quartet(s)".format(player, score))
+                return sys.exit(0)
 
 
     def check_quartet(self, player_decks):
@@ -106,8 +100,9 @@ class Quartet() :
                 if count == 4 :
                     self.score[player]+=1
                     print(player,"has a quartet!")
-                    print(player,"is putting down {}-{}-{}-{}".format(*player_decks[player]))  
-                    print(self.check_cards_left(player_decks))
+                    down =[str(letter+'-'+str(num)) for letter, num in player_decks[player]]
+                    print(player,"is putting down {} {} {} {}".format(*down))  
+
 
     def check_ask(self,player_to_ask,card_to_ask , player_decks, ask_log, player):
         if card_to_ask in player_decks[player_to_ask]  :
@@ -116,7 +111,7 @@ class Quartet() :
             player_decks[player].append(card_to_ask)
             self.display_cards(self.player_decks)
             self.whos_turn(player)
-            self.availables_cards(player, self.player_decks, self.deck)
+            self.draw_card(player, self.player_decks, self.deck)
         if card_to_ask in ask_log[player_to_ask]:
                 print("card already asked!")
         else : 
