@@ -22,8 +22,7 @@ class Quartet() :
                 self.display_cards(self.player_decks) 
                 self.check_quartet(self.player_decks)  
                 self.whos_turn(player)
-                self.draw_card(player, self.player_decks, self.ask_log)
-        
+                self.draw_card(player, self.player_decks, self.ask_log)     
 
     def create_deck(self): 
         self.deck = []
@@ -72,7 +71,6 @@ class Quartet() :
             player_to_ask.remove(player)
             player_to_ask = random.choice(player_to_ask)
             if len(ask_log)== 0 or [player_to_ask] not in ask_log[player_to_ask] :
-                print("not asked")
                 break
             else :
                 print("already asked")
@@ -91,7 +89,6 @@ class Quartet() :
                     print("{} has {} quartet(s)".format(player, score))
                 return sys.exit(0)
 
-
     def check_quartet(self, player_decks):
         for player in player_decks.keys():
             self.score[player]= 0
@@ -102,7 +99,7 @@ class Quartet() :
                     print(player,"has a quartet!")
                     down =[str(letter+'-'+str(num)) for letter, num in player_decks[player]]
                     print(player,"is putting down {} {} {} {}".format(*down))  
-
+                    break
 
     def check_ask(self,player_to_ask,card_to_ask , player_decks, ask_log, player):
         if card_to_ask in player_decks[player_to_ask]  :
