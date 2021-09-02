@@ -57,6 +57,7 @@ a complete set of 4 cards, you say out loud: ‘Quartet!’ and put the quartet 
 with the most quartets is the winner.
 
 <!-- GETTING STARTED -->
+## Getting Started
 
 ### Prerequisites
 
